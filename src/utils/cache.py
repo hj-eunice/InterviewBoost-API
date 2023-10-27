@@ -3,12 +3,7 @@ from collections import defaultdict
 import os
 import queue
 
-# third-party packages
-import openai
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
-GEN_QUESTIONS_HOW_MANY = 5
-
+from utils.openai.openai_apis import generate_starting_questions
 
 """ example of the cache:
 {
@@ -38,32 +33,3 @@ def get_cached_starting_questions(job_title, job_level, n=1):
             cached_starting_questions[job_title][job_level].put(q)
 
     return cached_starting_questions[job_title][job_level].get()
-
-
-def generate_starting_questions(job_title, job_level):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        n=GEN_QUESTIONS_HOW_MANY,
-        messages=[
-            {"role": "system", "content": "You suggest one creative question to interviewers who are working for IT companies."},
-            {"role": "user", "content": generate_prompt(job_title, job_level)}
-        ],
-        stop=["#", "\n", "\\\""]
-    )
-    # print(response)
-
-    res = [""] * GEN_QUESTIONS_HOW_MANY
-
-    for choice in response.choices:
-        res[choice.index] = choice.message.content
-
-    # print(res)
-    return res
-
-
-def generate_prompt(job_title, job_level):
-    return """Can you suggest me a creative behavioral question 
-    I can ask to someone applying for the {} {} position?
-    A question should be no longer than 200 characters.
-    A question must not include any hashtags.
-    Strip the first and last quotes.""".format(job_level, job_title)
