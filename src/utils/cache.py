@@ -1,6 +1,5 @@
 # system packages
 from collections import defaultdict
-import os
 import queue
 
 from utils.openai.openai_apis import generate_starting_questions

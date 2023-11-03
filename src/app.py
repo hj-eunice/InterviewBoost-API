@@ -17,7 +17,8 @@ CORS(app)
 @app.route("/questions/first", methods=["POST"])
 def generate_first_question():
     req_form = request.form
-    job_title, job_level = req_form["job_title"], req_form["job_level"]
+    job_title = req_form["job_title"], 
+    job_level = req_form.get("job_level", "")
     print(job_title, job_level)
 
     question = get_cached_starting_questions(job_title, job_level)

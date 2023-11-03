@@ -25,10 +25,10 @@ def generate_starting_questions(job_title, job_level):
 
 def generate_prompt(job_title, job_level):
     return """Can you suggest me a creative behavioral question 
-    I can ask to someone applying for the {} {} position?
+    I can ask to someone applying for the {} position?
     A question should be no longer than 200 characters.
     A question must not include any hashtags.
-    Strip the first and last quotes.""".format(job_level, job_title)
+    Strip the first and last quotes.""".format(job_title)
 
 
 def speech_to_text(audio_file):
