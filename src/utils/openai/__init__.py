@@ -2,6 +2,8 @@
 import os
 
 # third-party packages
-import openai
+from openai import OpenAI
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai_client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+)

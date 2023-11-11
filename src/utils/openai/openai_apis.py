@@ -1,11 +1,11 @@
 # local packages
-from utils.openai import openai
+from utils.openai import openai_client
 
 GEN_QUESTIONS_HOW_MANY = 5
 
 
 def generate_starting_questions(job_title, job_level):
-    response = openai.ChatCompletion.create(
+    response = openai_client.chat.completions.create(
         model="gpt-3.5-turbo",
         n=GEN_QUESTIONS_HOW_MANY,
         messages=[
@@ -32,5 +32,7 @@ def generate_prompt(job_title, job_level):
 
 
 def speech_to_text(audio_file):
-    transcript = openai.Audio.transcribe("whisper-1", audio_file)
+    transcript = openai_client.audio.transcriptions.create(
+        model="whisper-1", 
+        file=audio_file)
     return transcript.text
