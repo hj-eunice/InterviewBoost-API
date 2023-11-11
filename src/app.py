@@ -1,6 +1,7 @@
 # system packages
 import base64
 import tempfile
+import uuid
 
 # third-party packages
 from flask import Flask, jsonify, request
@@ -9,6 +10,7 @@ from flask_cors import CORS
 # local packages
 from utils.cache import get_cached_starting_questions
 from utils.openai.openai_apis import speech_to_text
+from utils import redis
 
 app = Flask(__name__)
 CORS(app)
@@ -27,7 +29,8 @@ def generate_first_question():
         "success": True,
         "question": question,
         "job_title": job_title,
-        "job_level": job_level
+        "job_level": job_level,
+        "id": str(uuid.uuid4())
     })
 
 
@@ -53,14 +56,44 @@ def transcribe():
     })
 
 
-@app.route("/save", methods=["POST"])
-def save_result():
+@app.route("/submit", methods=["POST"])
+def submit_answer():
     req_form = request.form
+    user_id = req_form.get("id")
+
+    # save transcript to redis
+    question_num = req_form.get("question")
+    transcript = req_form.get("transcript", "")
+    redis.save_transcript(user_id, question_num, transcript)
+
+    # TODO save audio in filesystem
+
+    # TODO next question
+    question = "Why do you want to work for us?"
 
     return jsonify({
         "success": True,
-        "transcript": request.form.get("transcript", ""),
-        "raw_audio": request.files.get("rawAudio")
+        "id": user_id,
+        "question": question,
+    })
+
+
+@app.route("/results", methods=["POST"])
+def results():
+    req_form = request.form
+    user_id = req_form.get("id")
+
+    # save transcript to redis
+    question_num = req_form.get("question")
+    transcript = req_form.get("transcript", "")
+    redis.save_transcript(user_id, question_num, transcript)
+
+    transcripts = redis.get_all_transcripts(user_id)
+
+    return jsonify({
+        "success": True,
+        "id": user_id,
+        "answers": transcripts,
     })
 
 
