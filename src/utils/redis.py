@@ -9,9 +9,11 @@ import redis
 REDIS_SERVER = redis.from_url(os.environ['REDIS_URL'])
 PREFIX = "InterviewBooster"
 
+TTL=60*60
+
 
 def save_transcript(user_id, question_num, transcript_txt):
-    REDIS_SERVER.set(f"{PREFIX}-{user_id}-{question_num}", transcript_txt)
+    REDIS_SERVER.set(f"{PREFIX}-{user_id}-{question_num}", transcript_txt, ex=TTL)
 
 
 def get_all_transcripts(user_id):
